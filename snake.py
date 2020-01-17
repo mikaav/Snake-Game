@@ -66,8 +66,8 @@ class Snake(Canvas):
         
         self.create_image(x[0], y[0], image=self.head, anchor="nw", tag="head")
         
-        for i in range(1, LENGTH):
-             self.create_image(x[i], y[i], image=self.body, anchor="nw", tag="body")
+        for i in range(LENGTH -1, 0, -1):
+            self.create_image(x[i], y[i], image=self.body, anchor="nw", tag="body")
 
 
     def spawnApple(self):
