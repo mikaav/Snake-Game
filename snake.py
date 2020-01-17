@@ -24,6 +24,7 @@ class Snake(Canvas):
     apple = False
     delay = 0
     direction = "Right"
+    directiontemp = "Right"
     loss = False
 
     def __init__(self):
@@ -79,12 +80,29 @@ class Snake(Canvas):
 
     def onKeyPressed(self, event):
         key = event.keysym
-        print(key)
-        
+        if key == "Left" and self.direction != "Right":
+            self.directiontemp = "Left"
+        elif key == "Right" and self.direction != "Left":
+            self.directiontemp = "Right"
+        elif key == "Up" and self.direction != "Down":
+            self.directiontemp = "Up"
+        elif key == "Down" and self.direction != "Up":
+            self.directiontemp = "Down"
+
 
 
     def updateDirection(self):
-        pass
+        self.direction = self.directiontemp
+        head = self.find_withtag("head")
+        headx, heady = self.coords(head)
+        self.delete(head)
+        if self.direction == "Left":
+            self.head = ImageTk.PhotoImage(self, headImage.Transpose(Image.FLIP_LEFT_RIGHT).resize((BODYSIZE,BODYSIZE),Image.ANTIALIAS))
+        else:
+            rotates = {"Right" : 0, "Up" : 90, "Down" : -90}
+            self.head = ImageTk.PhotoImage(self,headImage.rotate(rotates[self.direction]).resize((BODYSIZE,BODYSIZE),Image.ANTIALIAS))
+        
+        self.create_image(headx, heady, image=self.head, anchor="nw", tag="head")
 
 
 
