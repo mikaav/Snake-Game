@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 WIDTH = 1000
 HEIGHT = 650
 BODYSIZE = 50
-STARTDELAY = 200
+STARTDELAY = 500
 LENGTH = 3
 
 countBodyW = WIDTH / BODYSIZE
@@ -49,6 +49,7 @@ class Snake(Canvas):
 
         self.delete(ALL)
         self.spawnActors()
+        self.after(self.delay, self.timer)
 
     def spawnActors(self):
 
@@ -77,7 +78,40 @@ class Snake(Canvas):
         self.create_image(rx * BODYSIZE, ry * BODYSIZE, anchor="nw", image=self.apple, tag="apple")
 
     def onKeyPressed(self, event):
+        key = event.keysym
+        print(key)
+        
+
+
+    def updateDirection(self):
         pass
+
+
+
+    def timer(self):
+        if not self.loss:
+            self.moveSnake()
+            self.updateDirection()
+            self.after(self.delay, self.timer)
+
+
+    def moveSnake(self):
+        head = self.find_withtag("head")
+        body = self.find_withtag("body")
+        item = body + head
+        for i in range(len(item) - 1):
+            currentxy = self.coords(item[i])
+            nextxy =self.coords(item[i+1])
+            self.move(item[i], nextxy[0] - currentxy[0], nextxy[1] - currentxy[1])
+
+        if self.direction == "Left":
+            self.move(head, -BODYSIZE, 0)
+        elif self.direction == "Right":
+            self.move(head, BODYSIZE, 0)
+        elif self.direction == "Up":
+            self.move(head, 0, -BODYSIZE)
+        elif self.direction == "Down":
+            self.move(head, 0, BODYSIZE)
 
 
 root = Tk()
