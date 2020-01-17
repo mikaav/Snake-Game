@@ -1,8 +1,9 @@
+import random
 from tkinter import *
-from PIL import *
+from PIL import Image, ImageTk
 
 WIDTH = 1000
-HEIGHT = 1000
+HEIGHT = 650
 BODYSIZE = 50
 STARTDELAY = 200
 LENGTH = 3
@@ -50,6 +51,11 @@ class Snake(Canvas):
         self.spawnActors()
 
     def spawnActors(self):
+
+        self.spawnApple()
+
+        global x
+        global y
         x[0] = int(countBodyW / 2) * BODYSIZE
         y[0] = int(countBodyH / 2) * BODYSIZE
         for i in range(1, LENGTH):
@@ -60,6 +66,15 @@ class Snake(Canvas):
         
         for i in range(1, LENGTH):
              self.create_image(x[i], y[i], image=self.body, anchor="nw", tag="body")
+
+
+    def spawnApple(self):
+        apple = self.find_withtag("apple")
+        if apple:
+            self.delete(apple[0])
+        rx = random.randint(0, countBodyW - 1)
+        ry = random.randint(0, countBodyH - 1)
+        self.create_image(rx * BODYSIZE, ry * BODYSIZE, anchor="nw", image=self.apple, tag="apple")
 
     def onKeyPressed(self, event):
         pass
