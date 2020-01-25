@@ -170,7 +170,7 @@ class Snake(Canvas):
 
 
 root = Tk()
-root.title("Змейка")
+root.title("Snake")
 
 root.board = Snake()
 
