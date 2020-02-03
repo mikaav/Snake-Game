@@ -1,20 +1,21 @@
 import random
 from tkinter import *
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk   -nujen dlya vivoda izobrajeniy
 
 WIDTH = 1000
 HEIGHT = 650
-BODYSIZE = 50
-STARTDELAY = 500
+BODYSIZE = 50  -razmer odnoy kletochki (zmei ili yabloka)
+STARTDELAY = 500  -nachalniy interval dlya taimera *(taimer chtob sozdavat animaciyu)
 MINDELAY = 100
 STEPDELAY = 20
-LENGTH = 3
+LENGTH = 3  -nachalnaya dlina smeyki
 
-countBodyW = WIDTH / BODYSIZE
-countBodyH = HEIGHT / BODYSIZE
+countBodyW = WIDTH / BODYSIZE   -skolko vsego kletok po shirine
+countBodyH = HEIGHT / BODYSIZE   -skolko vsego kletok po visote
 
-class Snake(Canvas):
+class Snake(Canvas):   -klass kanva poneli docherni ot canvasa
 
+    - Peremennie
     x = False
     y = False
     headImage = False
@@ -26,54 +27,56 @@ class Snake(Canvas):
     directiontemp = "Right"
     loss = False
 
-    def __init__(self):
+    def __init__(self): -konstruktor inicaliziruem i vizivaem roditelskiy konstruktor
         Canvas.__init__(self, width=WIDTH, height=HEIGHT, background="black", highlightthickness=0)
-        self.focus_get()
-        self.bind_all("<Key>", self.onKeyPressed)
-        self.loadResources()
-        self.beginplay()
+        self.focus_get()  -chtob najimali knopki i oni obrabativalis
+        self.bind_all("<Key>", self.onKeyPressed) -veshaem binding i ukazivaem vse klavishi chtob obrabativalis
+        self.loadResources()  -zagrujaem resursi (kartinki)
+        self.beginplay() -pri zapuske chtob nachinalas igra
         self.pack()
 
-    def loadResources(self):
+    def loadResources(self):      -funkciya zagrujaem i ukazivaem put
         self.headImage = Image.open("images/head.png")
+
+        -Sozdayom izobrajeniya so soystvami resize chtob izmenit razmer na ukazaniiy vishe,sglajivaniya 
 
         self.head = ImageTk.PhotoImage(self.headImage.resize((BODYSIZE, BODYSIZE), Image.ANTIALIAS))
         self.body = ImageTk.PhotoImage(Image.open("images/body.png").resize((BODYSIZE, BODYSIZE), Image.ANTIALIAS))
         self.apple = ImageTk.PhotoImage(Image.open("images/apple.png").resize((BODYSIZE, BODYSIZE), Image.ANTIALIAS))
 
-    def beginplay(self):
+    def beginplay(self):  -metod vizivaetsya pri nachale igri
         self.delay = STARTDELAY
-        self.direction = "Right"
+        self.direction = "Right" -po umolchaniyu dvijenie zmeyki
         self.directiontemp = "Right"
-        self.loss = False
+        self.loss = False -proigral polzovatel ili net
 
         self.x = [0] * int(countBodyW)
         self.y = [0] * int(countBodyH)
 
-        self.delete(ALL)
-        self.spawnActors()
+        self.delete(ALL)   -ochishaem vsjo chto do etogo narisovali (igru)
+        self.spawnActors()  -spamnim vse obyekti na igrovom pole
         self.after(self.delay, self.timer)
 
-    def spawnActors(self):
+    def spawnActors(self):  -spamni vse obyekti na igrovom pole
 
-        self.spawnApple()
+        self.spawnApple()   -chtob poyavilos yabloko
 
-        self.x[0] = int(countBodyW / 2) * BODYSIZE
+        self.x[0] = int(countBodyW / 2) * BODYSIZE  -sozdayom golovu v seredine polya po x i po y
         self.y[0] = int(countBodyH / 2) * BODYSIZE
-        for i in range(1, LENGTH):
+        for i in range(1, LENGTH):   -sozdayom telo zmeyki s 1 potomuchto 0 eto golova
             self.x[i] = self.x[0] - BODYSIZE * i
             self.y[i] = self.y[0]
-        self.create_image(self.x[0], self.y[0], image=self.head, anchor="nw", tag="head")
-        for i in range(LENGTH - 1, 0, -1):
+        self.create_image(self.x[0], self.y[0], image=self.head, anchor="nw", tag="head") -sozdayom izobrajenie
+        for i in range(LENGTH - 1, 0, -1):   -vivodim xvost
             self.create_image(self.x[i], self.y[i], image=self.body, anchor="nw", tag="body")
 
-    def spawnApple(self):
+    def spawnApple(self):  -Vivod yabloka
         apple = self.find_withtag("apple")
-        if apple:
+        if apple:   -esli yabloko naydeno to udalyaem ego
             self.delete(apple[0])
-        rx = random.randint(0, countBodyW - 1)
-        ry = random.randint(0, countBodyH - 1)
-        self.create_image(rx * BODYSIZE, ry * BODYSIZE, anchor="nw", image=self.apple, tag="apple")
+        rx = random.randint(0, countBodyW - 1) - poluchaem sluchaynuyu tochku x
+        ry = random.randint(0, countBodyH - 1) - poluchaem sluchaynuyu tochku y
+        self.create_image(rx * BODYSIZE, ry * BODYSIZE, anchor="nw", image=self.apple, tag="apple") -vivodim snova yabloko
 
     def checkApple(self):
         apple = self.find_withtag("apple")[0]
@@ -108,7 +111,7 @@ class Snake(Canvas):
         if y2 > HEIGHT:
             self.loss = True
 
-    def onKeyPressed(self, event):
+    def onKeyPressed(self, event):   -najatie knopok chto knopka kuda idti
         key = event.keysym
         if key == "Left" and self.direction != "Right":
             self.directiontemp = key
@@ -169,19 +172,19 @@ class Snake(Canvas):
         self.create_text(self.winfo_width() / 2, self.winfo_height() / 2 + 60, text="Please enter Space for new game", fill="white", font="Tahoma 40", tag="text")
 
 
-root = Tk()
-root.title("Snake")
+root = Tk()    -sozdayom okno
+root.title("Snake")   - nazvanie okna
 
-root.board = Snake()
+root.board = Snake()   -pomeshaem v okno nashu igru
 
-root.resizable(False, False)
+root.resizable(False, False) -chtob ne izmenyat razmeri
 
-ws = root.winfo_screenwidth()
-hs = root.winfo_screenheight()
+ws = root.winfo_screenwidth()   -poluchaem shirinu okna u polzovatelya
+hs = root.winfo_screenheight()  -poluchaem visotu okna u polzovatelya
 
-x = int(ws / 2 - WIDTH / 2)
-y = int(hs / 2 - HEIGHT / 2)
+x = int(ws / 2 - WIDTH / 2)    -opredelyaem kordinati verxnego levogo ugla
+y = int(hs / 2 - HEIGHT / 2)   -kordinati pravogo verxnego ugla
 
-root.geometry("+{0}+{1}".format(x, y))
+root.geometry("+{0}+{1}".format(x, y))  - vivodim
 
-root.mainloop()
+root.mainloop()    -zapuskaem okno
