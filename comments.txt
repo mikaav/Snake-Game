@@ -79,37 +79,38 @@ class Snake(Canvas):   -klass kanva poneli docherni ot canvasa
         self.create_image(rx * BODYSIZE, ry * BODYSIZE, anchor="nw", image=self.apple, tag="apple") -vivodim snova yabloko
 
     def checkApple(self):
-        apple = self.find_withtag("apple")[0]
-        head = self.find_withtag("head")
-        body = self.find_withtag("body")[-1]
-        x1, y1, x2, y2 = self.bbox(head)
+        apple = self.find_withtag("apple")[0] -opredelyaem gde naxoditsya yabloko
+        head = self.find_withtag("head") -opredelyaem gde naxoditsya golova
+        body = self.find_withtag("body")[-1]  -naxodim samiy posledniy ellement zmei
+        x1, y1, x2, y2 = self.bbox(head)  -opredelyaem peresekliz li kolizii golovi i yabloka
         overlaps = self.find_overlapping(x1, y1, x2, y2)
-        for actor in overlaps:
-            if actor == apple:
-                tempx, tempy = self.coords(body)
-                self.spawnApple()
-                self.create_image(tempx, tempy, image=self.body, anchor="nw", tag="body")
-                if self.delay > MINDELAY:
+        for actor in overlaps:    -pereberaem vsyo chto popalo v dannor peresechenie
+            if actor == apple:   -esli v koliziyu golovi popalo yabloko udalyaem apple(v funkcii spawnApple)
+                tempx, tempy = self.coords(body)  -soxranyaem koordinati chtob sozdat xvost zmei (resuetsya gde posledniy ellemnt)
+                self.spawnApple() -udalyaem sozdayom novoe yabloko (delaetsya v funnkciii spawnApple)
+                self.create_image(tempx, tempy, image=self.body, anchor="nw", tag="body") -na meste koordinat yabloka sozdayom xvost delo zmeyi
+                if self.delay > MINDELAY: -chtob kajdiy raz kak syedaem yabloko zaderjka dvijeniya umenshalas
                     self.delay -= STEPDELAY
 
-    def checkCollisions(self):
-        head = self.find_withtag("head")
-        body = self.find_withtag("body")
-        x1, y1, x2, y2 = self.bbox(head)
-        overlaps = self.find_overlapping(x1, y1, x2, y2)
-        for b in body:
-            for actor in overlaps:
-                if actor == b:
-                    self.loss = True
+    def checkCollisions(self):  -funkciya proverki stalknoveniy
+        head = self.find_withtag("head") -naxodim golovu
+        body = self.find_withtag("body")   -naxodim telo
+        x1, y1, x2, y2 = self.bbox(head)   -smotrim tolko po golove 
+        overlaps = self.find_overlapping(x1, y1, x2, y2) -smotrim s chem peresekaetsya golova
+        for b in body:   -pereberaem vse elementi tela
+            for actor in overlaps: -smotrim s chem pereseklas golova zmeyi
+                if actor == b: -esli actor eto telo zmei
+                    self.loss = True  -togda proigrish loss stanovitsya true
 
+          -proveryaem predeli ekrana 
         if x1 < 0:
-            self.loss = True
-        if x2 > WIDTH:
-            self.loss = True
+            self.loss = True   -uxodit vlevuyu oblast ekrana 
+        if x2 > WIDTH:   
+            self.loss = True   -uxodit vpravuyu oblast ekrana  
         if y1 < 0:
-            self.loss = True
+            self.loss = True   -uxodit zmeya vverx
         if y2 > HEIGHT:
-            self.loss = True
+            self.loss = True   -uxodit zmeyu v niz 
 
     def onKeyPressed(self, event):   -najatie knopok chto knopka kuda idti *(obrabodka klavish)
         key = event.keysym
@@ -121,8 +122,8 @@ class Snake(Canvas):   -klass kanva poneli docherni ot canvasa
             self.directiontemp = key
         elif key == "Down" and self.direction != "Up":
             self.directiontemp = key
-        elif key == "space" and self.loss:
-            self.beginplay()
+        elif key == "space" and self.loss:  -esli proigrish i najimaem probel 
+            self.beginplay()             -vizivaetsya funkciya beginplay nachinaem igru zanovo
 
     def updateDirection(self):  -funkciya srabativaet kogda vizivaetsya taimer
         self.direction = self.directiontemp -primenyaem novoe znachenie kak postoyannoe
@@ -140,14 +141,14 @@ class Snake(Canvas):   -klass kanva poneli docherni ot canvasa
         self.create_image(headx, heady, image=self.head, anchor="nw", tag="head")  -sozdayom novuyu golovu
 
     def timer(self):   -Timer dlya animacii
-        self.checkCollisions()
+        self.checkCollisions() -proveryaem na stolknoveniya zmeyu
         if not self.loss:  -prodoljaem esli polyovatel ne proigral
-            self.checkApple()
+            self.checkApple()  -vizivaem funkciyu chtob pribavlyalsya xvost
             self.updateDirection() -obnovlyaem napravleniya dvijeniya zmeyki
             self.moveSnake() -sdvigaem zmeyku na odnu poziciyu
             self.after(self.delay, self.timer) -vizivaem metod snova kak v beginplay ato animaciya  ostanovitsya
         else:
-            self.gameOver()
+            self.gameOver()  -eli proigrish vizivaem funkciyu gameOver 
 
     def moveSnake(self):   
         head = self.find_withtag("head") -naxodim , poluchaem izobrajenita golovi
@@ -167,8 +168,9 @@ class Snake(Canvas):   -klass kanva poneli docherni ot canvasa
             self.move(head, 0, BODYSIZE)  -tolko po Y uvelichivaem na BODYSIZE x ostayotsya 0
 
     def gameOver(self):
-        body = self.find_withtag("body")
-        self.delete(ALL)
+        body = self.find_withtag("body")  -ishem vse elementi tela chtob pokazat kakaya bila dlina zmei
+        self.delete(ALL)  -udalyaem vse chto est na canve 
+        -pechataem teks po centru 
         self.create_text(self.winfo_width() / 2, self.winfo_height() / 2 - 60, text="Game Over!", fill="white", font="Tahoma 40", tag="text")
         self.create_text(self.winfo_width() / 2, self.winfo_height() / 2, text="Snake's length: " + str(len(body) + 1), fill="white", font="Tahoma 40", tag="text")
         self.create_text(self.winfo_width() / 2, self.winfo_height() / 2 + 60, text="Please enter Space for new game", fill="white", font="Tahoma 40", tag="text")
