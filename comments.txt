@@ -55,7 +55,7 @@ class Snake(Canvas):   -klass kanva poneli docherni ot canvasa
 
         self.delete(ALL)   -ochishaem vsjo chto do etogo narisovali (igru)
         self.spawnActors()  -spamnim vse obyekti na igrovom pole
-        self.after(self.delay, self.timer)
+        self.after(self.delay, self.timer) -timer dlya animacii (perviy arg zaderjka vtoroy visov funkcii)
 
     def spawnActors(self):  -spamni vse obyekti na igrovom pole
 
@@ -111,7 +111,7 @@ class Snake(Canvas):   -klass kanva poneli docherni ot canvasa
         if y2 > HEIGHT:
             self.loss = True
 
-    def onKeyPressed(self, event):   -najatie knopok chto knopka kuda idti
+    def onKeyPressed(self, event):   -najatie knopok chto knopka kuda idti *(obrabodka klavish)
         key = event.keysym
         if key == "Left" and self.direction != "Right":
             self.directiontemp = key
@@ -124,45 +124,47 @@ class Snake(Canvas):   -klass kanva poneli docherni ot canvasa
         elif key == "space" and self.loss:
             self.beginplay()
 
-    def updateDirection(self):
-        self.direction = self.directiontemp
-        head = self.find_withtag("head")
-        headx, heady = self.coords(head)
-        self.delete(head)
-        if self.direction == "Left":
+    def updateDirection(self):  -funkciya srabativaet kogda vizivaetsya taimer
+        self.direction = self.directiontemp -primenyaem novoe znachenie kak postoyannoe
+        head = self.find_withtag("head") -naxodim golovu s pomoshju tag
+        headx, heady = self.coords(head) -vitaeskivaem iz golovi koordinati x i y
+        self.delete(head) -posle tago kak uznali koordinati udalyaem golovu
+        if self.direction == "Left":  -esli napravlenie vlevo 
+            menyaem izobrajenie i s pomoshju transpose razvorachivaem izob. v drugou storonu (kak zerkalnoe)
             self.head = ImageTk.PhotoImage(self.headImage.transpose(Image.FLIP_LEFT_RIGHT).resize((BODYSIZE, BODYSIZE), Image.ANTIALIAS))
         else:
-            rotates = {"Right": 0, "Up": 90, "Down": - 90}
+            rotates = {"Right": 0, "Up": 90, "Down": - 90} -esli zmeya dvijetsya vverx vniz ili vpravo
+            togda prosto povarachivaem izob. esli vpravo na 0 gradusov, esli vverx na 90 gradusov i esli vniz na -90 gradusov
             self.head = ImageTk.PhotoImage(self.headImage.rotate(rotates[self.direction]).resize((BODYSIZE, BODYSIZE), Image.ANTIALIAS))
 
-        self.create_image(headx, heady, image=self.head, anchor="nw", tag="head")
+        self.create_image(headx, heady, image=self.head, anchor="nw", tag="head")  -sozdayom novuyu golovu
 
-    def timer(self):
+    def timer(self):   -Timer dlya animacii
         self.checkCollisions()
-        if not self.loss:
+        if not self.loss:  -prodoljaem esli polyovatel ne proigral
             self.checkApple()
-            self.updateDirection()
-            self.moveSnake()
-            self.after(self.delay, self.timer)
+            self.updateDirection() -obnovlyaem napravleniya dvijeniya zmeyki
+            self.moveSnake() -sdvigaem zmeyku na odnu poziciyu
+            self.after(self.delay, self.timer) -vizivaem metod snova kak v beginplay ato animaciya  ostanovitsya
         else:
             self.gameOver()
 
-    def moveSnake(self):
-        head = self.find_withtag("head")
-        body = self.find_withtag("body")
+    def moveSnake(self):   
+        head = self.find_withtag("head") -naxodim , poluchaem izobrajenita golovi
+        body = self.find_withtag("body") -naxodim , poluchaem izobrajenita tela
         items = body + head
-        for i in range(len(items) - 1):
-            currentxy = self.coords(items[i])
-            nextxy = self.coords(items[i + 1])
-            self.move(items[i], nextxy[0] - currentxy[0], nextxy[1] - currentxy[1])
-        if self.direction == "Left":
-            self.move(head, -BODYSIZE, 0)
-        elif self.direction == "Right":
-            self.move(head, BODYSIZE, 0)
-        elif self.direction == "Up":
-            self.move(head, 0, -BODYSIZE)
-        elif self.direction == "Down":
-            self.move(head, 0, BODYSIZE)
+        for i in range(len(items) - 1):  -perebiraem vse elementi krome poslednego
+            currentxy = self.coords(items[i])  - koordinati tekushego elementa
+            nextxy = self.coords(items[i + 1]) -novie koordinati sledushego elementa 
+            self.move(items[i], nextxy[0] - currentxy[0], nextxy[1] - currentxy[1]) -vizivaem fun. ukazivaem kaky el dvigat i na skolko sdvinut po x i y
+        if self.direction == "Left":  - dvijenie golovi vlevo
+            self.move(head, -BODYSIZE, 0) -dvigaem tolko po X na -BODYSIZE po Yku 0
+        elif self.direction == "Right":  - Dvijenie golovi vpravo 
+            self.move(head, BODYSIZE, 0)  -dvigaem tolko po X uvelichivaem na BODYSIZE po yku 0
+        elif self.direction == "Up":  - dvigaem golovu naverx
+            self.move(head, 0, -BODYSIZE)  -dvigaem tolko po Y na -BODYSIZE x ostayotska 0
+        elif self.direction == "Down":  -dvigaem golovu vniz
+            self.move(head, 0, BODYSIZE)  -tolko po Y uvelichivaem na BODYSIZE x ostayotsya 0
 
     def gameOver(self):
         body = self.find_withtag("body")
